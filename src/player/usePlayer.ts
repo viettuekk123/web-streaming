@@ -33,6 +33,10 @@ export function usePlayer(
         : null;
     progressRef.current = progress;
     async function open() {
+      // StrictMode setup → cleanup → setup ngay trong cùng lượt render.
+      // Chờ một microtask để effect đã bị cleanup không mở phiên ghi thừa.
+      await Promise.resolve();
+      if (!active) return;
       let resume = 0;
       if (progress) {
         try {
