@@ -7,19 +7,30 @@ export class SourceQueue {
 
   private enqueue(action: () => void): Promise<void> {
     const task = this.tail.then(() => {
-      if (this.disposed) throw new DOMException('Player đã đóng', 'AbortError');
+      if (this.disposed) throw new DOMException("Player đã đóng", "AbortError");
       return new Promise<void>((resolve, reject) => {
         const cleanup = () => {
-          this.buffer.removeEventListener('updateend', success);
-          this.buffer.removeEventListener('error', failure);
-          this.buffer.removeEventListener('abort', failure);
+          this.buffer.removeEventListener("updateend", success);
+          this.buffer.removeEventListener("error", failure);
+          this.buffer.removeEventListener("abort", failure);
         };
-        const success = () => { cleanup(); resolve(); };
-        const failure = () => { cleanup(); reject(new Error('SourceBuffer không nhận được media')); };
-        this.buffer.addEventListener('updateend', success, { once: true });
-        this.buffer.addEventListener('error', failure, { once: true });
-        this.buffer.addEventListener('abort', failure, { once: true });
-        try { action(); } catch (error) { cleanup(); reject(error); }
+        const success = () => {
+          cleanup();
+          resolve();
+        };
+        const failure = () => {
+          cleanup();
+          reject(new Error("SourceBuffer không nhận được media"));
+        };
+        this.buffer.addEventListener("updateend", success, { once: true });
+        this.buffer.addEventListener("error", failure, { once: true });
+        this.buffer.addEventListener("abort", failure, { once: true });
+        try {
+          action();
+        } catch (error) {
+          cleanup();
+          reject(error);
+        }
       });
     });
     this.tail = task.catch(() => {});
@@ -31,9 +42,15 @@ export class SourceQueue {
   }
 
   remove(start: number, end: number): Promise<void> {
-    return end > start ? this.enqueue(() => this.buffer.remove(start, end)) : Promise.resolve();
+    return end > start
+      ? this.enqueue(() => this.buffer.remove(start, end))
+      : Promise.resolve();
   }
 
-  idle(): Promise<void> { return this.tail; }
-  dispose() { this.disposed = true; }
+  idle(): Promise<void> {
+    return this.tail;
+  }
+  dispose() {
+    this.disposed = true;
+  }
 }

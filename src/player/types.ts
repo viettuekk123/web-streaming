@@ -26,7 +26,7 @@ export interface Manifest {
 }
 
 export interface PlayerStats {
-  status: 'loading' | 'playing' | 'paused' | 'buffering' | 'ended' | 'error';
+  status: "loading" | "playing" | "paused" | "buffering" | "ended" | "error";
   error: string;
   buffer: number;
   throughput: number;
